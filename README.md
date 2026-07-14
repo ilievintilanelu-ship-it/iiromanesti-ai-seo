@@ -36,6 +36,31 @@ Completeaza urmatoarele campuri:
 - **Perioada pastrare jurnale**: interval intre 1 si 365 zile.
 - **Numar maxim versiuni istoric**: interval intre 1 si 100.
 
+
+## Build pachet ZIP
+
+Arhiva ZIP nu se versionaza in repository. Pastreaza in Git doar codul sursa si genereaza pachetul de instalare local, atunci cand ai nevoie de distributie.
+
+### Windows
+
+```powershell
+./build.ps1
+```
+
+### Linux / macOS
+
+```bash
+./build.sh
+```
+
+Ambele scripturi creeaza automat arhiva:
+
+```text
+dist/iiromanesti_ai_seo-v0.1.0.zip
+```
+
+Nu adauga arhive `.zip` in commituri. Fisierul generat este ignorat de Git.
+
 ## Testare manuala
 
 1. Instaleaza modulul din Back Office.
