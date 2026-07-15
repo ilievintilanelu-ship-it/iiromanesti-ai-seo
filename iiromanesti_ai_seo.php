@@ -69,6 +69,7 @@ class Iiromanesti_Ai_Seo extends Module
         $installed = parent::install()
             && $this->installConfiguration()
             && $this->installTabs()
+            && $this->registerHook('displayAdminProductsMainStepLeftColumnMiddle')
             && $this->registerHook('displayAdminProductsExtra');
 
         if ($installed) {
@@ -96,7 +97,17 @@ class Iiromanesti_Ai_Seo extends Module
     }
 
 
+    public function hookDisplayAdminProductsMainStepLeftColumnMiddle($params)
+    {
+        return $this->renderProductAiPanel($params);
+    }
+
     public function hookDisplayAdminProductsExtra($params)
+    {
+        return $this->renderProductAiPanel($params);
+    }
+
+    private function renderProductAiPanel($params)
     {
         $idProduct = 0;
         if (isset($params['id_product'])) {
