@@ -15,6 +15,8 @@ require_once __DIR__ . '/classes/Logger.php';
 require_once __DIR__ . '/classes/ApiClient.php';
 require_once __DIR__ . '/classes/ProductAudit.php';
 require_once __DIR__ . '/classes/ProductGeneratorService.php';
+require_once __DIR__ . '/classes/StoreProfileManager.php';
+require_once __DIR__ . '/classes/PromptBuilder.php';
 
 class Iiromanesti_Ai_Seo extends Module
 {
@@ -31,6 +33,7 @@ class Iiromanesti_Ai_Seo extends Module
     const TAB_CLASS_MAIN = 'AdminIiromanestiAiSeo';
     const TAB_CLASS_DASHBOARD = 'AdminIiromanestiAiSeoDashboard';
     const TAB_CLASS_PRODUCT_AUDIT = 'AdminIiromanestiAiSeoProductAudit';
+    const TAB_CLASS_PROFILES = 'AdminIiromanestiAiSeoProfiles';
 
     const DEFAULT_PROVIDER = 'openai';
     const DEFAULT_MODEL = 'gpt-4o-mini';
@@ -183,6 +186,15 @@ class Iiromanesti_Ai_Seo extends Module
             return false;
         }
 
+        if (!$this->installTab(
+            self::TAB_CLASS_PROFILES,
+            $this->l('Profiluri AI'),
+            (int) $mainTabId,
+            'icon-list'
+        )) {
+            return false;
+        }
+
         return (bool) $this->installTab(
             self::TAB_CLASS_PRODUCT_AUDIT,
             $this->l('Audit SEO produs'),
@@ -223,6 +235,7 @@ class Iiromanesti_Ai_Seo extends Module
         $result = true;
         $tabClasses = array(
             self::TAB_CLASS_PRODUCT_AUDIT,
+            self::TAB_CLASS_PROFILES,
             self::TAB_CLASS_DASHBOARD,
             self::TAB_CLASS_MAIN,
         );
