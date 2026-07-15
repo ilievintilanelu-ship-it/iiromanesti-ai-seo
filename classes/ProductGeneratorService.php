@@ -11,6 +11,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/StoreProfileManager.php';
+require_once dirname(__FILE__) . '/PromptBuilder.php';
+
 class IiromanestiAiSeoProductGeneratorService
 {
     private $context;
@@ -20,6 +23,32 @@ class IiromanestiAiSeoProductGeneratorService
     {
         $this->context = $context;
         $this->module = $module;
+    }
+
+    public function buildPrompt($idProduct, array $selectedFields, array $auditReport = array(), $idLang = null)
+    {
+        $idLang = $idLang ? (int) $idLang : (int) $this->context->language->id;
+        $shop = new Shop((int) $this->context->shop->id);
+        $language = new Language((int) $idLang);
+        $profileManager = new IiromanestiAiSeoStoreProfileManager();
+        $profile = $profileManager->getActiveProfile($shop, $language);
+        $builder = new IiromanestiAiSeoPromptBuilder();
+
+        return $builder->buildProductPrompt(
+            $profile,
+            $this->buildProductContext($idProduct, $idLang),
+            $selectedFields,
+            $auditReport,
+            $this->getPromptSettings()
+        );
+    }
+
+    private function getPromptSettings()
+    {
+        return array(
+            'meta_title_max' => 70,
+            'meta_description_max' => 160,
+        );
     }
 
     public function buildProductContext($idProduct, $idLang = null)

@@ -98,3 +98,18 @@ php -l classes/ApiClient.php
 php -l classes/ProductAudit.php
 php -l controllers/admin/AdminIiromanestiAiSeoProductAuditController.php
 ```
+
+
+## Profiluri AI
+
+Modulul include sistemul modular de profiluri AI pentru standardizarea continutului generat. In aceasta etapa este implementat exclusiv profilul predefinit `iiromanesti_ro`, asociat magazinului `iiromanesti.ro` si limbii romane fara diacritice.
+
+Arhitectura profilurilor:
+- `StoreProfileInterface` defineste contractul pentru cod profil, magazin, limba, reguli, versiune, istoric si sectiunea de prompt.
+- `StoreProfileManager` selecteaza profilul activ in functie de contextul multistore si multilang.
+- `IiromanestiRoProfile` contine regulile comerciale, SEO, imagine, caracteristici, conversie si siguranta pentru iiromanesti.ro.
+- `PromptBuilder` compune promptul final din reguli generale de siguranta, profilul activ, date reale produs, campurile selectate, auditul produsului si schema JSON a raspunsului.
+
+Pagina Back Office **iiRomanesti AI > Profiluri AI** afiseaza profilul activ, magazinul asociat, limba, regulile principale, versiunea `1.0.0`, data ultimei modificari si istoricul versiunilor. Profilul este doar vizualizat; editarea, invatarea automata, procesarea in masa, sincronizarea externa si profilurile celorlalte magazine nu sunt implementate in aceasta etapa.
+
+Generatorul ramane fara salvare automata: promptul cere explicit sa nu fie inventate date, sa nu fie promise stocuri/livrare/origine/calitate neconfirmate si sa nu fie modificat produsul fara confirmare.
