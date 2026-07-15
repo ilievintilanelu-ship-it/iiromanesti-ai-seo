@@ -13,6 +13,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once __DIR__ . '/classes/Logger.php';
 require_once __DIR__ . '/classes/ApiClient.php';
+require_once __DIR__ . '/classes/ProductAudit.php';
 
 class Iiromanesti_Ai_Seo extends Module
 {
@@ -28,6 +29,7 @@ class Iiromanesti_Ai_Seo extends Module
 
     const TAB_CLASS_MAIN = 'AdminIiromanestiAiSeo';
     const TAB_CLASS_DASHBOARD = 'AdminIiromanestiAiSeoDashboard';
+    const TAB_CLASS_PRODUCT_AUDIT = 'AdminIiromanestiAiSeoProductAudit';
 
     const DEFAULT_PROVIDER = 'openai';
     const DEFAULT_MODEL = 'gpt-4o-mini';
@@ -62,7 +64,8 @@ class Iiromanesti_Ai_Seo extends Module
     {
         $installed = parent::install()
             && $this->installConfiguration()
-            && $this->installTabs();
+            && $this->installTabs()
+            && $this->registerHook('displayAdminProductsExtra');
 
         if ($installed) {
             $this->moduleLogger->info('Instalare modul finalizata.');
@@ -86,6 +89,27 @@ class Iiromanesti_Ai_Seo extends Module
         }
 
         return (bool) $uninstalled;
+    }
+
+
+    public function hookDisplayAdminProductsExtra($params)
+    {
+        $idProduct = 0;
+        if (isset($params['id_product'])) {
+            $idProduct = (int) $params['id_product'];
+        } elseif (Tools::getValue('id_product')) {
+            $idProduct = (int) Tools::getValue('id_product');
+        }
+
+        if ($idProduct <= 0) {
+            return '';
+        }
+
+        $this->context->smarty->assign(array(
+            'iiro_audit_url' => $this->context->link->getAdminLink(self::TAB_CLASS_PRODUCT_AUDIT) . '&id_product=' . (int) $idProduct,
+        ));
+
+        return $this->display(__FILE__, 'views/templates/hook/product_audit_button.tpl');
     }
 
     public function getContent()
@@ -120,11 +144,20 @@ class Iiromanesti_Ai_Seo extends Module
             return false;
         }
 
-        return (bool) $this->installTab(
+        if (!$this->installTab(
             self::TAB_CLASS_DASHBOARD,
             $this->l('Dashboard'),
             (int) $mainTabId,
             'icon-dashboard'
+        )) {
+            return false;
+        }
+
+        return (bool) $this->installTab(
+            self::TAB_CLASS_PRODUCT_AUDIT,
+            $this->l('Audit SEO produs'),
+            -1,
+            'icon-search'
         );
     }
 
@@ -159,6 +192,7 @@ class Iiromanesti_Ai_Seo extends Module
     {
         $result = true;
         $tabClasses = array(
+            self::TAB_CLASS_PRODUCT_AUDIT,
             self::TAB_CLASS_DASHBOARD,
             self::TAB_CLASS_MAIN,
         );
