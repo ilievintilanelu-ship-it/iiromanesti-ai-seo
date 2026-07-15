@@ -69,7 +69,7 @@ class Iiromanesti_Ai_Seo extends Module
         $installed = parent::install()
             && $this->installConfiguration()
             && $this->installTabs()
-            && $this->registerHook('displayAdminProductsExtra');
+            && $this->installProductPageHooks();
 
         if ($installed) {
             $this->moduleLogger->info('Instalare modul finalizata.');
@@ -98,33 +98,55 @@ class Iiromanesti_Ai_Seo extends Module
 
     public function hookDisplayAdminProductsExtra($params)
     {
-        $idProduct = 0;
-        if (isset($params['id_product'])) {
-            $idProduct = (int) $params['id_product'];
-        } elseif (Tools::getValue('id_product')) {
-            $idProduct = (int) Tools::getValue('id_product');
-        }
+        return $this->renderProductPageHookPanel(__FUNCTION__, $params);
+    }
 
-        if ($idProduct <= 0) {
-            return '';
-        }
+    public function hookDisplayAdminProductsMainStepLeftColumnMiddle($params)
+    {
+        return $this->renderProductPageHookPanel(__FUNCTION__, $params);
+    }
 
-        try {
-            $generatorService = new IiromanestiAiSeoProductGeneratorService($this->context, $this);
-            $generatorContext = $generatorService->buildProductContext($idProduct);
-        } catch (Exception $exception) {
-            $generatorContext = array();
-        }
+    public function hookDisplayAdminProductsMainStepRightColumnBottom($params)
+    {
+        return $this->renderProductPageHookPanel(__FUNCTION__, $params);
+    }
+
+    public function hookDisplayAdminProductsSeoStepBottom($params)
+    {
+        return $this->renderProductPageHookPanel(__FUNCTION__, $params);
+    }
+
+    public function hookDisplayAdminProductsOptionsStepBottom($params)
+    {
+        return $this->renderProductPageHookPanel(__FUNCTION__, $params);
+    }
+
+    private function renderProductPageHookPanel($hookMethod, array $params)
+    {
+        $idProduct = $this->resolveProductIdFromHookParams($params);
+        $this->moduleLogger->info('Executie hook pagina produs: ' . $hookMethod . ' (id_product=' . (int) $idProduct . ').');
 
         $this->context->smarty->assign(array(
-            'iiro_audit_url' => $this->context->link->getAdminLink(self::TAB_CLASS_PRODUCT_AUDIT) . '&id_product=' . (int) $idProduct,
-            'iiro_ai_generator_fields' => $this->getAiGeneratorFields(),
-            'iiro_ai_product_context' => $generatorContext,
-            'iiro_ai_pending_text' => $this->l('In asteptarea generatorului AI'),
-            'iiro_ai_ready_message' => $this->l('Infrastructura AI pregatita. Generarea continutului va fi implementata in etapa urmatoare.'),
+            'iiro_ai_hook_method' => $hookMethod,
+            'iiro_ai_id_product' => (int) $idProduct,
         ));
 
+        $this->moduleLogger->info('Randare template panou test pagina produs: views/templates/hook/product_audit_button.tpl.');
+
         return $this->display(__FILE__, 'views/templates/hook/product_audit_button.tpl');
+    }
+
+    private function resolveProductIdFromHookParams(array $params)
+    {
+        if (isset($params['id_product'])) {
+            return (int) $params['id_product'];
+        }
+
+        if (isset($params['id'])) {
+            return (int) $params['id'];
+        }
+
+        return (int) Tools::getValue('id_product');
     }
 
 
@@ -162,6 +184,31 @@ class Iiromanesti_Ai_Seo extends Module
         }
 
         return $output . $this->renderConfigurationForm();
+    }
+
+
+    private function installProductPageHooks()
+    {
+        $hooks = array(
+            'displayAdminProductsExtra',
+            'displayAdminProductsMainStepLeftColumnMiddle',
+            'displayAdminProductsMainStepRightColumnBottom',
+            'displayAdminProductsSeoStepBottom',
+            'displayAdminProductsOptionsStepBottom',
+        );
+
+        $result = true;
+        foreach ($hooks as $hookName) {
+            $registered = (bool) $this->registerHook($hookName);
+            if ($registered) {
+                $this->moduleLogger->info('Instalare hook reusita: ' . $hookName . '.');
+            } else {
+                $this->moduleLogger->error('Instalare hook esuata: ' . $hookName . '. registerHook() a returnat false.');
+            }
+            $result = $registered && $result;
+        }
+
+        return (bool) $result;
     }
 
     private function installTabs()
