@@ -16,7 +16,7 @@ Modul PrestaShop 1.7.8.11 pentru fundatia tehnica a viitoarelor functionalitati 
 - Jurnalizare de baza pentru instalare, dezinstalare, salvare configurare, test conexiune si erori.
 - Compatibilitate multistore prin API-ul `Configuration` PrestaShop si compatibilitate multilang prin helper-ul standard de formular.
 - Protectie CSRF prin tokenul `AdminModules` si verificare de permisiune pentru angajatul Back Office.
-- Buton **Analizeaza produs** in pagina produsului din Back Office, prin hook-ul `displayAdminProductsExtra`.
+- Panou **Audit SEO produs** si **AI Generator** in pagina produsului din Back Office, prin hook-ul principal `displayAdminProductsMainStepLeftColumnMiddle`, cu fallback in tabul modulelor prin `displayAdminProductsExtra`.
 - Raport **Audit SEO produs** fara modificarea produsului, fara OpenAI si fara generare de continut AI.
 - Scoruri Google, Conversie si Completitudine, plus probleme detectate si recomandari pentru titlu, descrieri, meta, imagini, ALT, taguri, URL, categorie si lungimea continutului.
 
