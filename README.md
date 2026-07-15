@@ -6,6 +6,8 @@ Modul PrestaShop 1.7.8.11 pentru fundatia tehnica a viitoarelor functionalitati 
 
 - Structura standard de modul PrestaShop.
 - Instalare si dezinstalare cu valori implicite de configurare.
+- Meniu principal **iiRomanesti AI** in Back Office.
+- Pagina Dashboard cu statistici citite direct din baza de date PrestaShop.
 - Pagina de configurare in Back Office.
 - Campuri pentru activare modul, furnizor AI, model AI, cheia API, timeout, nivel jurnal, perioada de pastrare a jurnalelor si numarul maxim de versiuni istoric.
 - Validari explicite pentru toate campurile.
@@ -64,12 +66,13 @@ Nu adauga arhive `.zip` in commituri. Fisierul generat este ignorat de Git.
 ## Testare manuala
 
 1. Instaleaza modulul din Back Office.
-2. Salveaza configurarea cu valori valide.
-3. Verifica mesajul de succes in limba romana.
-4. Introdu valori invalide pentru timeout, perioada de pastrare sau istoric si verifica mesajele de eroare.
-5. Introdu o cheie API valida si apasa **Testeaza conexiunea API**.
-6. Verifica jurnalele PrestaShop pentru evenimentele modulului si confirma ca cheia API nu apare in loguri.
-7. Dezinstaleaza modulul si confirma stergerea configurarilor.
+2. Verifica meniul **iiRomanesti AI > Dashboard** si cardurile pentru produse, categorii si campuri SEO lipsa.
+3. Salveaza configurarea cu valori valide.
+4. Verifica mesajul de succes in limba romana.
+5. Introdu valori invalide pentru timeout, perioada de pastrare sau istoric si verifica mesajele de eroare.
+6. Introdu o cheie API valida si apasa **Testeaza conexiunea API**.
+7. Verifica jurnalele PrestaShop pentru evenimentele modulului si confirma ca cheia API nu apare in loguri.
+8. Dezinstaleaza modulul si confirma stergerea configurarilor si a meniului Back Office.
 
 ## Ce nu este inclus inca
 
@@ -85,6 +88,8 @@ Nu adauga arhive `.zip` in commituri. Fisierul generat este ignorat de Git.
 
 ```bash
 php -l iiromanesti_ai_seo.php
+php -l controllers/admin/AdminIiromanestiAiSeoController.php
+php -l controllers/admin/AdminIiromanestiAiSeoDashboardController.php
 php -l classes/Logger.php
 php -l classes/ApiClient.php
 ```

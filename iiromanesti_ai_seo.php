@@ -26,6 +26,9 @@ class Iiromanesti_Ai_Seo extends Module
     const CONFIG_LOG_RETENTION = 'IIRO_AI_SEO_LOG_RETENTION';
     const CONFIG_HISTORY_MAX = 'IIRO_AI_SEO_HISTORY_MAX';
 
+    const TAB_CLASS_MAIN = 'AdminIiromanestiAiSeo';
+    const TAB_CLASS_DASHBOARD = 'AdminIiromanestiAiSeoDashboard';
+
     const DEFAULT_PROVIDER = 'openai';
     const DEFAULT_MODEL = 'gpt-4o-mini';
     const DEFAULT_TIMEOUT = 30;
@@ -58,7 +61,8 @@ class Iiromanesti_Ai_Seo extends Module
     public function install()
     {
         $installed = parent::install()
-            && $this->installConfiguration();
+            && $this->installConfiguration()
+            && $this->installTabs();
 
         if ($installed) {
             $this->moduleLogger->info('Instalare modul finalizata.');
@@ -73,7 +77,8 @@ class Iiromanesti_Ai_Seo extends Module
     {
         $this->moduleLogger->info('Dezinstalare modul initiata.');
 
-        $uninstalled = $this->uninstallConfiguration()
+        $uninstalled = $this->uninstallTabs()
+            && $this->uninstallConfiguration()
             && parent::uninstall();
 
         if (!$uninstalled) {
@@ -100,6 +105,77 @@ class Iiromanesti_Ai_Seo extends Module
         }
 
         return $output . $this->renderConfigurationForm();
+    }
+
+    private function installTabs()
+    {
+        $mainTabId = $this->installTab(
+            self::TAB_CLASS_MAIN,
+            $this->l('iiRomanesti AI'),
+            0,
+            'icon-lightbulb-o'
+        );
+
+        if (!$mainTabId) {
+            return false;
+        }
+
+        return (bool) $this->installTab(
+            self::TAB_CLASS_DASHBOARD,
+            $this->l('Dashboard'),
+            (int) $mainTabId,
+            'icon-dashboard'
+        );
+    }
+
+    private function installTab($className, $name, $parentId, $icon = '')
+    {
+        $existingTabId = (int) Tab::getIdFromClassName($className);
+        if ($existingTabId) {
+            return $existingTabId;
+        }
+
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = $className;
+        $tab->id_parent = (int) $parentId;
+        $tab->module = $this->name;
+        if (property_exists($tab, 'icon')) {
+            $tab->icon = $icon;
+        }
+
+        foreach (Language::getLanguages(false) as $language) {
+            $tab->name[(int) $language['id_lang']] = $name;
+        }
+
+        if (!$tab->add()) {
+            return false;
+        }
+
+        return (int) $tab->id;
+    }
+
+    private function uninstallTabs()
+    {
+        $result = true;
+        $tabClasses = array(
+            self::TAB_CLASS_DASHBOARD,
+            self::TAB_CLASS_MAIN,
+        );
+
+        foreach ($tabClasses as $className) {
+            $tabId = (int) Tab::getIdFromClassName($className);
+            if (!$tabId) {
+                continue;
+            }
+
+            $tab = new Tab($tabId);
+            if (Validate::isLoadedObject($tab)) {
+                $result = (bool) $tab->delete() && $result;
+            }
+        }
+
+        return $result;
     }
 
     private function installConfiguration()
