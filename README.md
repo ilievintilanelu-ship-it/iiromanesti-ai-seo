@@ -16,6 +16,9 @@ Modul PrestaShop 1.7.8.11 pentru fundatia tehnica a viitoarelor functionalitati 
 - Jurnalizare de baza pentru instalare, dezinstalare, salvare configurare, test conexiune si erori.
 - Compatibilitate multistore prin API-ul `Configuration` PrestaShop si compatibilitate multilang prin helper-ul standard de formular.
 - Protectie CSRF prin tokenul `AdminModules` si verificare de permisiune pentru angajatul Back Office.
+- Buton **Analizeaza produs** in pagina produsului din Back Office, prin hook-ul `displayAdminProductsExtra`.
+- Raport **Audit SEO produs** fara modificarea produsului, fara OpenAI si fara generare de continut AI.
+- Scoruri Google, Conversie si Completitudine, plus probleme detectate si recomandari pentru titlu, descrieri, meta, imagini, ALT, taguri, URL, categorie si lungimea continutului.
 
 ## Instalare
 
@@ -67,20 +70,20 @@ Nu adauga arhive `.zip` in commituri. Fisierul generat este ignorat de Git.
 
 1. Instaleaza modulul din Back Office.
 2. Verifica meniul **iiRomanesti AI > Dashboard** si cardurile pentru produse, categorii si campuri SEO lipsa.
-3. Salveaza configurarea cu valori valide.
-4. Verifica mesajul de succes in limba romana.
-5. Introdu valori invalide pentru timeout, perioada de pastrare sau istoric si verifica mesajele de eroare.
-6. Introdu o cheie API valida si apasa **Testeaza conexiunea API**.
-7. Verifica jurnalele PrestaShop pentru evenimentele modulului si confirma ca cheia API nu apare in loguri.
-8. Dezinstaleaza modulul si confirma stergerea configurarilor si a meniului Back Office.
+3. Deschide un produs in Back Office si apasa **Analizeaza produs** in sectiunea **Audit SEO produs**.
+4. Confirma afisarea scorurilor Google, Conversie si Completitudine, a listei de probleme si a recomandarilor, fara salvarea produsului.
+5. Salveaza configurarea cu valori valide.
+6. Verifica mesajul de succes in limba romana.
+7. Introdu valori invalide pentru timeout, perioada de pastrare sau istoric si verifica mesajele de eroare.
+8. Introdu o cheie API valida si apasa **Testeaza conexiunea API**.
+9. Verifica jurnalele PrestaShop pentru evenimentele modulului si confirma ca cheia API nu apare in loguri.
+10. Dezinstaleaza modulul si confirma stergerea configurarilor si a meniului Back Office.
 
 ## Ce nu este inclus inca
 
 - Butoane de generare SEO in pagina produsului.
 - Modificari asupra produselor.
 - Prompturi functionale de generare continut.
-- Audit Google.
-- Audit de conversie.
 - Curatare automata efectiva a jurnalelor vechi.
 - Management al istoricului de versiuni SEO.
 
@@ -92,4 +95,6 @@ php -l controllers/admin/AdminIiromanestiAiSeoController.php
 php -l controllers/admin/AdminIiromanestiAiSeoDashboardController.php
 php -l classes/Logger.php
 php -l classes/ApiClient.php
+php -l classes/ProductAudit.php
+php -l controllers/admin/AdminIiromanestiAiSeoProductAuditController.php
 ```
