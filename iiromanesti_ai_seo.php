@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 require_once __DIR__ . '/classes/Logger.php';
 require_once __DIR__ . '/classes/ApiClient.php';
 require_once __DIR__ . '/classes/ProductAudit.php';
+require_once __DIR__ . '/classes/ProductGeneratorService.php';
 
 class Iiromanesti_Ai_Seo extends Module
 {
@@ -105,11 +106,40 @@ class Iiromanesti_Ai_Seo extends Module
             return '';
         }
 
+        try {
+            $generatorService = new IiromanestiAiSeoProductGeneratorService($this->context, $this);
+            $generatorContext = $generatorService->buildProductContext($idProduct);
+        } catch (Exception $exception) {
+            $generatorContext = array();
+        }
+
         $this->context->smarty->assign(array(
             'iiro_audit_url' => $this->context->link->getAdminLink(self::TAB_CLASS_PRODUCT_AUDIT) . '&id_product=' . (int) $idProduct,
+            'iiro_ai_generator_fields' => $this->getAiGeneratorFields(),
+            'iiro_ai_product_context' => $generatorContext,
+            'iiro_ai_pending_text' => $this->l('In asteptarea generatorului AI'),
+            'iiro_ai_ready_message' => $this->l('Infrastructura AI pregatita. Generarea continutului va fi implementata in etapa urmatoare.'),
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/product_audit_button.tpl');
+    }
+
+
+    private function getAiGeneratorFields()
+    {
+        return array(
+            'product_name' => $this->l('Denumire produs'),
+            'short_description' => $this->l('Descriere scurta'),
+            'long_description_html' => $this->l('Descriere lunga HTML'),
+            'meta_title' => $this->l('Meta Title'),
+            'meta_description' => $this->l('Meta Description'),
+            'image_alt' => $this->l('ALT imagine'),
+            'faq' => $this->l('FAQ'),
+            'json_ld' => $this->l('JSON-LD'),
+            'primary_keywords' => $this->l('Cuvinte cheie principale'),
+            'secondary_keywords' => $this->l('Cuvinte cheie secundare'),
+            'internal_links' => $this->l('Linkuri interne recomandate'),
+        );
     }
 
     public function getContent()
